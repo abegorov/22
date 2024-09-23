@@ -17,3 +17,10 @@
     - zabbix_server
     - zabbix_inventory
     - zabbix_dashboards
+
+- name: Grafana server provision
+  hosts: grafana
+  become: true
+  gather_facts: false
+  roles:
+    - prometheus

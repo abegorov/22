@@ -1,0 +1,5 @@
+---
+- name: Install prometheus server
+  ansible.builtin.dnf:
+    name: golang-github-prometheus
+    state: present
