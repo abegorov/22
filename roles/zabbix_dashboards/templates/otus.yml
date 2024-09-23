@@ -30,7 +30,7 @@ pages:
           - name: reference
             type: 1
             value: JKAMT
-      - name: Available Memory
+      - name: Memory utilization
         type: svggraph
         view_mode: 0
         width: 36
