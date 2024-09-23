@@ -1,3 +1,5 @@
 ---
 zabbix_server_ip: 192.168.50.10
 zabbix_hostname: '{{ inventory_hostname }}'
+zabbix_psk: '{{ lookup("ansible.builtin.password",
+  "passwords/zabbix_psk.txt", chars=["digits", "abcdef"], length=64) }}'

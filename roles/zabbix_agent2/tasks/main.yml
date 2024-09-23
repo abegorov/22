@@ -6,9 +6,19 @@
       - zabbix-selinux-policy
     state: present
 
+- name: Create zabbix_agent2 PSK 001 file
+  ansible.builtin.copy:
+    content: '{{ zabbix_psk }}'
+    dest: /etc/zabbix/zabbix_agent2.psk
+    backup: true
+    owner: zabbix
+    group: zabbix
+    mode: '0600'
+  notify: Restart zabbix-agent2 service
+
 - name: Configure zabbix-agent2
   ansible.builtin.template:
-    src: zabbix_agentd2.conf
+    src: zabbix_agent2.conf
     dest: /etc/zabbix/zabbix_agent2.conf
     backup: true
     owner: root
