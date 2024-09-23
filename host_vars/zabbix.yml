@@ -1,0 +1,18 @@
+---
+internal_ip: 192.168.50.10
+
+zabbix_db_name: zabbix
+zabbix_db_password: '{{ lookup("ansible.builtin.password",
+  "passwords/zabbix_db.txt", length=32) }}'
+
+zabbix_admin_user: otus
+zabbix_admin_password: '{{ lookup("ansible.builtin.password",
+  "passwords/zabbix_admin.txt", length=32) }}'
+zabbix_token:  '{{ lookup("ansible.builtin.file",
+  "passwords/zabbix_token.txt") }}'
+
+zabbix_external_host: 127.0.0.1
+zabbix_external_port: 8080
+zabbix_external_path: ''
+zabbix_external_ssl: false
+zabbix_external_validate_certs: false

@@ -1,0 +1,7 @@
+---
+- name: Install zabbix-release package
+  ansible.builtin.dnf:
+    name: "https://repo.zabbix.com/zabbix/7.0/alma/9/x86_64/\
+      zabbix-release-latest.el9.noarch.rpm"
+    disable_gpg_check: true
+    state: present

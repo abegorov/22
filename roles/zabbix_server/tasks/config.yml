@@ -1,0 +1,51 @@
+---
+- name: Configure Zabbix API connection options
+  ansible.builtin.set_fact:
+    zabbix_api_connection: &zabbix_api_connection
+      ansible_network_os: community.zabbix.zabbix
+      ansible_connection: httpapi
+      ansible_host: '{{ zabbix_external_host }}'
+      ansible_httpapi_port: '{{ zabbix_external_port }}'
+      ansible_httpapi_use_ssl: '{{ zabbix_external_ssl }}'
+      ansible_httpapi_validate_certs: '{{ zabbix_external_validate_certs }}'
+      ansible_zabbix_url_path: '{{ zabbix_external_path }}'
+      ansible_user: '{{ zabbix_admin_user }}'
+      ansible_password: '{{ zabbix_admin_password }}'
+  when: false
+
+- name: Remove Zabbix Server from hosts
+  become: false
+  vars: *zabbix_api_connection
+  community.zabbix.zabbix_host:
+    host_name: Zabbix server
+    state: absent
+
+- name: Create Zabbix token and generate token string
+  become: false
+  vars: *zabbix_api_connection
+  community.zabbix.zabbix_token:
+    name: Admin token
+    description: Admin token created by Ansible
+    username: '{{ zabbix_admin_user }}'
+    status: false
+    expires_at: 0
+    generate_token: true
+    state: present
+  register: zabbix_token_create
+  when: zabbix_db_create.changed  # noqa: no-handler
+
+- name: Update Zabbix token and generate token string
+  become: false
+  delegate_to: localhost
+  ansible.builtin.copy:
+    content: '{{ zabbix_token_create.token }}'
+    dest: passwords/zabbix_token.txt
+    mode: '0600'
+  when: zabbix_token_create.changed  # noqa: no-handler
+
+- name: Sleep for 180 seconds and continue with play
+  become: false
+  delegate_to: localhost
+  ansible.builtin.wait_for:
+    timeout: 180
+  when: zabbix_db_create.changed  # noqa: no-handler

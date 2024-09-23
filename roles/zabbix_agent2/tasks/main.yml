@@ -1,0 +1,25 @@
+---
+- name: Install zabbix-agent2 package
+  ansible.builtin.dnf:
+    name:
+      - zabbix-agent2
+      - zabbix-selinux-policy
+    state: present
+
+- name: Configure zabbix-agent2
+  ansible.builtin.template:
+    src: zabbix_agentd2.conf
+    dest: /etc/zabbix/zabbix_agent2.conf
+    backup: true
+    owner: root
+    group: root
+    mode: '0644'
+    validate: zabbix_agent2 --test-config --config %s
+  notify: Restart zabbix-agent2 service
+
+- name: Enable and start zabbix-agent2 service
+  ansible.builtin.systemd_service:
+    name: zabbix-agent2.service
+    enabled: true
+    state: started
+  ignore_errors: '{{ ansible_check_mode }}'

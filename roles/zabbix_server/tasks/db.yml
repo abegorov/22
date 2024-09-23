@@ -1,0 +1,65 @@
+---
+- name: Init postgresql database cluster
+  ansible.builtin.command: postgresql-setup --initdb
+  args:
+    creates: /var/lib/pgsql/data/postgresql.conf
+
+- name: Configure postgresql host-based authentication
+  ansible.builtin.template:
+    src: pg_hba.conf
+    dest: /var/lib/pgsql/data/pg_hba.conf
+    owner: postgres
+    group: postgres
+    mode: '0600'
+  notify: Reload postgresql service
+
+- name: Enable and start postgresql service
+  ansible.builtin.systemd_service:
+    name: postgresql.service
+    enabled: true
+    state: started
+  ignore_errors: '{{ ansible_check_mode }}'
+
+- name: Create zabbix db user
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_user:
+    user: zabbix
+    password: '{{ zabbix_db_password }}'
+  environment:
+    PGOPTIONS: "-c password_encryption=scram-sha-256"
+
+- name: Create zabbix db
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_db:
+    name: '{{ zabbix_db_name }}'
+    owner: zabbix
+    encoding: Unicode
+    template: template0
+  register: zabbix_db_create
+
+- name: Import initial schema and data
+  ansible.builtin.shell: 'set -o pipefail &&
+    zcat /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz |
+    psql -U zabbix {{ zabbix_db_name }}'
+  environment:
+    PGPASSWORD: '{{ zabbix_db_password }}'
+  changed_when: true
+  when: zabbix_db_create.changed  # noqa: no-handler
+
+- name: Update zabbix admin username and password
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_query:
+    db: '{{ zabbix_db_name }}'
+    query: |
+      UPDATE users
+      SET username = %(username)s, passwd = %(passwd)s
+      WHERE username = 'Admin'
+    named_args:
+      username: '{{ zabbix_admin_user }}'
+      passwd: '{{ zabbix_admin_password |
+        ansible.builtin.password_hash(hashtype="bcrypt", ident="2y") }}'
+  ignore_errors: '{{ ansible_check_mode }}'
+  when: zabbix_db_create.changed  # noqa: no-handler

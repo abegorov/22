@@ -1,0 +1,78 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+MACHINES = {
+  :'zabbix' => {
+    :domain => 'internal',
+    :box => 'almalinux/9/v9.4.20240805',
+    :cpus => 2,
+    :memory => 2048,
+    :networks => [
+      [
+        :private_network, {
+          :ip => '192.168.50.10',
+          :virtualbox__intnet => 'monitoring'
+        }
+      ], [
+        :forwarded_port, {
+          :guest => 8080,
+          :host_ip => '127.0.0.1',
+          :host => 8080
+        }
+      ]
+    ]
+  },
+  :'grafana' => {
+    :domain => 'internal',
+    :box => 'almalinux/9/v9.4.20240805',
+    :cpus => 2,
+    :memory => 2048,
+    :networks => [
+      [
+        :private_network, {
+          :ip => '192.168.50.20',
+          :virtualbox__intnet => 'monitoring'
+        }
+      ], [
+        :forwarded_port, {
+          :guest => 3000,
+          :host_ip => '127.0.0.1',
+          :host => 3000
+        }
+      ], [
+        :forwarded_port, {
+          :guest => 9090,
+          :host_ip => '127.0.0.1',
+          :host => 9090
+        }
+      ]
+    ]
+  }
+}
+
+Vagrant.configure("2") do |config|
+  MACHINES.each do |host_name, host_config|
+    config.vm.define host_name do |host|
+      host.vm.box = host_config[:box]
+      host.vm.host_name = host_name.to_s + '.' + host_config[:domain].to_s
+
+      host.vm.provider :virtualbox do |vb|
+        vb.cpus = host_config[:cpus]
+        vb.memory = host_config[:memory]
+      end
+
+      host_config[:networks].each do |network|
+        host.vm.network(network[0], **network[1])
+      end
+
+      if MACHINES.keys.last == host_name
+        host.vm.provision :ansible do |ansible|
+          ansible.playbook = 'playbook.yml'
+          ansible.limit = 'all'
+          ansible.compatibility_mode = '2.0'
+          ansible.raw_arguments = ['--diff']
+        end
+      end
+    end
+  end
+end

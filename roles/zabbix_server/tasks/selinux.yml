@@ -1,0 +1,12 @@
+---
+- name: Allow Zabbix create/use UNIX domain sockets
+  ansible.posix.seboolean:
+    name: httpd_can_connect_zabbix
+    state: true
+    persistent: true
+
+- name: Allow Zabbix frontend to connect to the database
+  ansible.posix.seboolean:
+    name: httpd_can_network_connect_db
+    state: true
+    persistent: true

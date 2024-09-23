@@ -1,0 +1,14 @@
+---
+- name: Install epel-release package
+  ansible.builtin.dnf:
+    name: epel-release
+    state: present
+
+- name: Disable Zabbix packages provided by EPEL
+  community.general.ini_file:
+    path: /etc/yum.repos.d/epel.repo
+    create: false
+    section: epel
+    option: excludepkgs
+    value: zabbix*
+    no_extra_spaces: true

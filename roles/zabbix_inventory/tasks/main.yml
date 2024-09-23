@@ -1,0 +1,27 @@
+---
+- name: Update zabbix hosts
+  become: false
+  vars:
+    ansible_network_os: community.zabbix.zabbix
+    ansible_connection: httpapi
+    ansible_host: '{{ zabbix_external_host }}'
+    ansible_httpapi_port: '{{ zabbix_external_port }}'
+    ansible_httpapi_use_ssl: '{{ zabbix_external_ssl }}'
+    ansible_httpapi_validate_certs: '{{ zabbix_external_validate_certs }}'
+    ansible_zabbix_url_path: '{{ zabbix_external_path }}'
+    ansible_zabbix_auth_key: '{{ zabbix_token }}'
+    ansible_command_timeout: 240
+  community.zabbix.zabbix_host:
+    host_name: '{{ hostvars[item].zabbix_hostname }}'
+    force: true
+    host_groups: '{{ ["Linux servers"] +
+      (["Zabbix servers"] if inventory_hostname == item else []) }}'
+    link_templates: '{{ ["Linux by Zabbix agent"] +
+      (["Zabbix server health"] if inventory_hostname == item else []) }}'
+    interfaces:
+      - type: agent
+        ip: '{{ hostvars[item].internal_ip }}'
+        dns: '{{ hostvars[item].inventory_hostname }}'
+        useip: 1
+        main: 1
+  loop: '{{ groups["all"] }}'

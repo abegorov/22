@@ -1,0 +1,19 @@
+---
+- name: Common provision
+  hosts: all
+  become: true
+  gather_facts: false
+  roles:
+    - epel_release
+    - zabbix_release
+    - node_exporter
+    - zabbix_agent2
+
+- name: Zabbix server provision
+  hosts: zabbix
+  become: true
+  gather_facts: false
+  roles:
+    - zabbix_server
+    - zabbix_inventory
+    - zabbix_dashboards

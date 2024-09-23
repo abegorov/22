@@ -1,0 +1,29 @@
+---
+- name: Configure zabbix-server
+  ansible.builtin.template:
+    src: zabbix_server.conf
+    dest: /etc/zabbix/zabbix_server.conf
+    backup: true
+    owner: root
+    group: zabbix
+    mode: '0600'
+    validate: zabbix_server --test-config --config %s
+  no_log: true
+  notify: Restart zabbix-server service
+
+- name: Configure zabbix gui
+  ansible.builtin.template:
+    src: zabbix.conf.php
+    dest: /etc/zabbix/web/zabbix.conf.php
+    backup: true
+    owner: apache
+    group: apache
+    mode: '0600'
+  no_log: true
+
+- name: Enable and start zabbix-server service
+  ansible.builtin.systemd_service:
+    name: zabbix-server.service
+    enabled: true
+    state: started
+  ignore_errors: '{{ ansible_check_mode }}'

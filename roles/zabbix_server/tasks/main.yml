@@ -1,0 +1,30 @@
+---
+- name: Install zabbix-server requirements
+  ansible.builtin.dnf:
+    name:
+      - zabbix-server-pgsql
+      - zabbix-web-pgsql
+      - zabbix-sql-scripts
+      - zabbix-nginx-conf
+      - zabbix-selinux-policy
+      - postgresql-server
+      - nginx-core
+      - python3-psycopg2
+      - python3-libsemanage
+      - glibc-all-langpacks
+    state: present
+
+- name: Import selinux tasks
+  ansible.builtin.import_tasks: selinux.yml
+
+- name: Import db tasks
+  ansible.builtin.import_tasks: db.yml
+
+- name: Import zabbix tasks
+  ansible.builtin.import_tasks: zabbix.yml
+
+- name: Import nginx tasks
+  ansible.builtin.import_tasks: nginx.yml
+
+- name: Import config tasks
+  ansible.builtin.import_tasks: config.yml

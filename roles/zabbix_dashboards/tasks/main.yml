@@ -1,0 +1,44 @@
+---
+- name: Configure Zabbix API connection options
+  ansible.builtin.set_fact:
+    zabbix_api_connection: &zabbix_api_connection
+      url: '{{ "https" if zabbix_external_ssl else "http" }}://{{
+          zabbix_external_host}}:{{ zabbix_external_port
+        }}{{
+          ("/" + zabbix_external_path) if zabbix_external_path
+        }}/api_jsonrpc.php'
+      validate_certs: '{{ zabbix_external_validate_certs }}'
+      body_format: json
+      headers:
+        Content-Type: application/json-rpc
+        Authorization: Bearer {{ zabbix_token }}
+  when: false
+
+- name: Get Zabbix dashboards
+  ansible.builtin.uri:
+    <<: *zabbix_api_connection
+    body:
+      jsonrpc: '2.0'
+      method: dashboard.get
+      id: 1
+      params: {}
+  changed_when: true
+  failed_when: zabbix_api_result.json.error | default(False)
+  register: zabbix_dashboards
+
+- name: Create Zabbix dashboards if not exist
+  vars:
+    params: '{{ lookup("ansible.builtin.template", item) | from_yaml }}'
+  ansible.builtin.uri:
+    <<: *zabbix_api_connection
+    body:
+      jsonrpc: '2.0'
+      method: dashboard.create
+      id: 1
+      params: '{{ params }}'
+  changed_when: true
+  failed_when: zabbix_api_result.json.error | default(False)
+  when: params.name not in zabbix_dashboards.json.result |
+    map(attribute="name")
+  register: zabbix_api_result
+  loop: '{{ query("ansible.builtin.fileglob", "templates/*.yml") }}'

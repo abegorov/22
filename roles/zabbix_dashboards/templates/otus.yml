@@ -1,0 +1,210 @@
+---
+name: otus
+auto_start: 1
+display_period: 10
+pages:
+  - name: CPU And Memory
+    widgets:
+      - name: CPU Utilization
+        type: svggraph
+        view_mode: 0
+        width: 36
+        height: 5
+        x: 0
+        y: 0
+        fields:
+{% for host in groups['all'] %}
+          - name: ds.0.hosts.{{ loop.index0 }}
+            type: 1
+            value: {{ hostvars[host].zabbix_hostname }}
+{% endfor %}
+          - name: ds.0.items.0
+            type: 1
+            value: CPU utilization
+          - name: ds.0.color
+            type: 1
+            value: FF0000
+          - name: righty
+            type: 0
+            value: 0
+          - name: reference
+            type: 1
+            value: JKAMT
+      - name: Available Memory
+        type: svggraph
+        view_mode: 0
+        width: 36
+        height: 5
+        x: 36
+        y: 0
+        fields:
+{% for host in groups['all'] %}
+          - name: ds.0.hosts.{{ loop.index0 }}
+            type: 1
+            value: {{ hostvars[host].zabbix_hostname }}
+{% endfor %}
+          - name: ds.0.items.0
+            type: 1
+            value: Memory utilization
+          - name: ds.0.color
+            type: 1
+            value: FF0080
+          - name: righty
+            type: 0
+            value: 0
+          - name: reference
+            type: 1
+            value: RBBHP
+  - name: Disk
+    widgets:
+      - name: Disk Utilization
+        type: svggraph
+        view_mode: 0
+        width: 36
+        height: 5
+        x: 0
+        y: 0
+        fields:
+{% for host in groups['all'] %}
+          - name: ds.0.hosts.{{ loop.index0 }}
+            type: 1
+            value: {{ hostvars[host].zabbix_hostname }}
+{% endfor %}
+          - name: ds.0.items.0
+            type: 1
+            value: 'sda: Disk utilization'
+          - name: ds.0.color
+            type: 1
+            value: BF00FF
+          - name: righty
+            type: 0
+            value: 0
+          - name: reference
+            type: 1
+            value: KDHNM
+      - name: Disk Average Queue Size
+        type: svggraph
+        view_mode: 0
+        width: 36
+        height: 5
+        x: 36
+        y: 0
+        fields:
+{% for host in groups['all'] %}
+          - name: ds.0.hosts.{{ loop.index0 }}
+            type: 1
+            value: {{ hostvars[host].zabbix_hostname }}
+{% endfor %}
+            type: 1
+            value: 'sda: Disk average queue size (avgqu-sz)'
+          - name: ds.0.color
+            type: 1
+            value: 4000FF
+          - name: righty
+            type: 0
+            value: 0
+          - name: reference
+            type: 1
+            value: LACOF
+  - name: Network
+    widgets:
+      - name: Bit Sent (eth0)
+        type: svggraph
+        view_mode: 0
+        width: 36
+        height: 5
+        x: 0
+        y: 0
+        fields:
+{% for host in groups['all'] %}
+          - name: ds.0.hosts.{{ loop.index0 }}
+            type: 1
+            value: {{ hostvars[host].zabbix_hostname }}
+{% endfor %}
+          - name: ds.0.items.0
+            type: 1
+            value: 'Interface eth0: Bits sent'
+          - name: ds.0.color
+            type: 1
+            value: FF4000
+          - name: righty
+            type: 0
+            value: 0
+          - name: reference
+            type: 1
+            value: DEMUD
+      - name: Bit Received (eth0)
+        type: svggraph
+        view_mode: 0
+        width: 36
+        height: 5
+        x: 36
+        y: 0
+        fields:
+{% for host in groups['all'] %}
+          - name: ds.0.hosts.{{ loop.index0 }}
+            type: 1
+            value: {{ hostvars[host].zabbix_hostname }}
+{% endfor %}
+          - name: ds.0.items.0
+            type: 1
+            value: 'Interface eth0: Bits received'
+          - name: ds.0.color
+            type: 1
+            value: FF8000
+          - name: righty
+            type: 0
+            value: 0
+          - name: reference
+            type: 1
+            value: YTYQZ
+      - name: Bit Sent (eth1)
+        type: svggraph
+        view_mode: 0
+        width: 36
+        height: 5
+        x: 0
+        y: 5
+        fields:
+{% for host in groups['all'] %}
+          - name: ds.0.hosts.{{ loop.index0 }}
+            type: 1
+            value: {{ hostvars[host].zabbix_hostname }}
+{% endfor %}
+          - name: ds.0.items.0
+            type: 1
+            value: 'Interface eth1: Bits sent'
+          - name: ds.0.color
+            type: 1
+            value: FF4000
+          - name: righty
+            type: 0
+            value: 0
+          - name: reference
+            type: 1
+            value: BEQKL
+      - name: Bit Received (eth1)
+        type: svggraph
+        view_mode: 0
+        width: 36
+        height: 5
+        x: 36
+        y: 5
+        fields:
+{% for host in groups['all'] %}
+          - name: ds.0.hosts.{{ loop.index0 }}
+            type: 1
+            value: {{ hostvars[host].zabbix_hostname }}
+{% endfor %}
+          - name: ds.0.items.0
+            type: 1
+            value: 'Interface eth1: Bits received'
+          - name: ds.0.color
+            type: 1
+            value: FF8000
+          - name: righty
+            type: 0
+            value: 0
+          - name: reference
+            type: 1
+            value: ZWWEP
