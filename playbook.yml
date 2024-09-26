@@ -16,6 +16,7 @@
   gather_facts: false
   roles:
     - prometheus
+    - grafana
 
 - name: Zabbix server provision
   hosts: zabbix

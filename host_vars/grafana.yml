@@ -12,3 +12,12 @@ prometheus_password_hash: '{{ lookup("ansible.builtin.password",
 
 prometheus_retention_time: 15d
 prometheus_retention_size: 10GB
+
+grafana_version: '11.2.1'
+grafana_subver: '-1'
+grafana_download_url: "https://dl.grafana.com/oss/release/\
+  grafana-{{ grafana_version }}{{ grafana_subver }}.x86_64.rpm"
+
+grafana_admin_user: otus
+grafana_admin_password: '{{ lookup("ansible.builtin.password",
+  "passwords/grafana_admin.txt", length=32) }}'
