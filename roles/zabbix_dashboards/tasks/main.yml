@@ -22,7 +22,7 @@
       method: dashboard.get
       id: 1
       params: {}
-  changed_when: true
+  changed_when: false
   failed_when: zabbix_api_result.json.error | default(False)
   register: zabbix_dashboards
 
