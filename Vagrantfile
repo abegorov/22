@@ -15,9 +15,9 @@ MACHINES = {
         }
       ], [
         :forwarded_port, {
-          :guest => 8080,
+          :guest => 8443,
           :host_ip => '127.0.0.1',
-          :host => 8080
+          :host => 8443
         }
       ]
     ]

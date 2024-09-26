@@ -1,4 +1,25 @@
 ---
+tls_ca_cn: MONITORING ROOT CA
+tls_ca_key: '{{ playbook_dir }}/passwords/ca.key'
+tls_ca_cert: '{{ playbook_dir }}/passwords/ca.crt'
+tls_cert_ca_key: '{{ tls_ca_key }}'
+tls_cert_ca_cert: '{{ tls_ca_cert }}'
+tls_zabbix_server_cn: Zabbix Server
+tls_zabbix_server_key: '{{ playbook_dir }}/passwords/zabbix_server.key'
+tls_zabbix_server_cert: '{{ playbook_dir }}/passwords/zabbix_server.crt'
+tls_zabbix_agent_cn: Zabbix Agent
+tls_zabbix_agent_key: '{{ playbook_dir }}/passwords/zabbix_agent.key'
+tls_zabbix_agent_cert: '{{ playbook_dir }}/passwords/zabbix_agent.crt'
+tls_cert_cn: '{{ inventory_hostname }}'
+tls_cert_san:
+  - 'DNS:{{ inventory_hostname }}'
+  - 'DNS:localhost'
+  - 'IP:{{ internal_ip }}'
+  - 'IP:127.0.0.1'
+tls_cert_key: '{{ playbook_dir }}/passwords/{{ inventory_hostname }}.key'
+tls_cert_cert: '{{ playbook_dir }}/passwords/{{ inventory_hostname }}.crt'
+tls_cert_not_after: '+365d'
+
 zabbix_server_ip: 192.168.50.10
 zabbix_hostname: '{{ inventory_hostname }}'
 zabbix_psk: '{{ lookup("ansible.builtin.password",

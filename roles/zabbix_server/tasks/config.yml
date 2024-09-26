@@ -13,7 +13,7 @@
       ansible_password: '{{ zabbix_admin_password }}'
   when: false
 
-- name: Remove Zabbix Server from hosts
+- name: Remove Zabbix server from hosts
   become: false
   vars: *zabbix_api_connection
   community.zabbix.zabbix_host:

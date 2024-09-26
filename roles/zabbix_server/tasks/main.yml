@@ -1,4 +1,14 @@
 ---
+- name: Generate server certificate
+  ansible.builtin.import_role:
+    name: tls_cert
+  vars:
+    tls_cert_cn: '{{ tls_zabbix_server_cn }}'
+    tls_cert_san: []
+    tls_cert_key: '{{ tls_zabbix_server_key }}'
+    tls_cert_cert: '{{ tls_zabbix_server_cert }}'
+    tls_cert_not_after: '+10957d'
+
 - name: Install zabbix-server requirements
   ansible.builtin.dnf:
     name:

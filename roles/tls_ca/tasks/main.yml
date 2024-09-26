@@ -1,0 +1,33 @@
+---
+- name: Create private key for CA
+  delegate_to: localhost
+  become: false
+  run_once: true
+  community.crypto.openssl_privatekey:
+    path: '{{ tls_ca_key }}'
+
+- name: Create certificate signing request (CSR) for CA certificate
+  delegate_to: localhost
+  become: false
+  run_once: true
+  community.crypto.openssl_csr_pipe:
+    common_name: '{{ tls_ca_cn }}'
+    use_common_name_for_san: false
+    basic_constraints: ['CA:TRUE']
+    basic_constraints_critical: true
+    key_usage: [keyCertSign]
+    key_usage_critical: true
+    privatekey_path: '{{ tls_ca_key }}'
+  changed_when: false
+  register: ca_csr
+
+- name: Create self-signed CA certificate from CSR
+  delegate_to: localhost
+  become: false
+  run_once: true
+  community.crypto.x509_certificate:
+    path: '{{ tls_ca_cert }}'
+    csr_content: "{{ ca_csr.csr }}"
+    privatekey_path: '{{ tls_ca_key }}'
+    provider: selfsigned
+    selfsigned_not_after: '+10957d'

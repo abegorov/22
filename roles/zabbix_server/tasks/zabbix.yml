@@ -1,4 +1,34 @@
 ---
+- name: Update zabbix-server CA file
+  ansible.builtin.copy:
+    src: '{{ tls_ca_cert }}'
+    dest: /etc/zabbix/zabbix_ca.crt
+    backup: true
+    owner: zabbix
+    group: zabbix
+    mode: '0644'
+  notify: Restart zabbix-server service
+
+- name: Update zabbix-server certificate file
+  ansible.builtin.copy:
+    src: '{{ tls_zabbix_server_cert }}'
+    dest: /etc/zabbix/zabbix_server.crt
+    backup: true
+    owner: zabbix
+    group: zabbix
+    mode: '0644'
+  notify: Restart zabbix-server service
+
+- name: Update zabbix-server key file
+  ansible.builtin.copy:
+    src: '{{ tls_zabbix_server_key }}'
+    dest: /etc/zabbix/zabbix_server.key
+    backup: true
+    owner: zabbix
+    group: zabbix
+    mode: '0600'
+  notify: Restart zabbix-server service
+
 - name: Configure zabbix-server
   ansible.builtin.template:
     src: zabbix_server.conf

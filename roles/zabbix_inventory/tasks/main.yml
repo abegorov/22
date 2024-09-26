@@ -18,10 +18,10 @@
       (["Zabbix servers"] if inventory_hostname == item else []) }}'
     link_templates: '{{ ["Linux by Zabbix agent"] +
       (["Zabbix server health"] if inventory_hostname == item else []) }}'
-    tls_accept: 2
-    tls_connect: 2
-    tls_psk: '{{ zabbix_psk }}'
-    tls_psk_identity: PSK 001
+    tls_accept: 4
+    tls_connect: 4
+    ca_cert: CN={{ tls_ca_cn }}
+    tls_subject: CN={{ tls_zabbix_agent_cn }}
     interfaces:
       - type: agent
         ip: '{{ hostvars[item].internal_ip }}'

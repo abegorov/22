@@ -1,4 +1,15 @@
 ---
+- name: Generate agent certificate
+  run_once: true
+  ansible.builtin.import_role:
+    name: tls_cert
+  vars:
+    tls_cert_cn: '{{ tls_zabbix_agent_cn }}'
+    tls_cert_san: []
+    tls_cert_key: '{{ tls_zabbix_agent_key }}'
+    tls_cert_cert: '{{ tls_zabbix_agent_cert }}'
+    tls_cert_not_after: '+10957d'
+
 - name: Install zabbix-agent2 package
   ansible.builtin.dnf:
     name:
@@ -6,10 +17,30 @@
       - zabbix-selinux-policy
     state: present
 
-- name: Create zabbix_agent2 PSK 001 file
+- name: Update zabbix-agent2 CA file
   ansible.builtin.copy:
-    content: '{{ zabbix_psk }}'
-    dest: /etc/zabbix/zabbix_agent2.psk
+    src: '{{ tls_ca_cert }}'
+    dest: /etc/zabbix/zabbix_ca.crt
+    backup: true
+    owner: zabbix
+    group: zabbix
+    mode: '0644'
+  notify: Restart zabbix-agent2 service
+
+- name: Update zabbix-agent2 certificate file
+  ansible.builtin.copy:
+    src: '{{ tls_zabbix_agent_cert }}'
+    dest: /etc/zabbix/zabbix_agent.crt
+    backup: true
+    owner: zabbix
+    group: zabbix
+    mode: '0644'
+  notify: Restart zabbix-agent2 service
+
+- name: Update zabbix-agent2 key file
+  ansible.builtin.copy:
+    src: '{{ tls_zabbix_agent_key }}'
+    dest: /etc/zabbix/zabbix_agent.key
     backup: true
     owner: zabbix
     group: zabbix

@@ -1,4 +1,26 @@
 ---
+- name: Update zabbix-web certificate file
+  ansible.builtin.copy:
+    content: |
+      {{ lookup('ansible.builtin.file', tls_cert_cert) }}
+      {{ lookup('ansible.builtin.file', tls_ca_cert) }}
+    dest: /etc/nginx/zabbix.crt
+    backup: true
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload nginx service
+
+- name: Update zabbix-web key file
+  ansible.builtin.copy:
+    src: '{{ tls_cert_key }}'
+    dest: /etc/nginx/zabbix.key
+    backup: true
+    owner: root
+    group: root
+    mode: '0600'
+  notify: Reload nginx service
+
 - name: Configure nginx
   ansible.builtin.template:
     src: zabbix_nginx.conf

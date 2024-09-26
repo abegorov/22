@@ -4,6 +4,8 @@
   become: true
   gather_facts: false
   roles:
+    - tls_ca
+    - tls_cert
     - epel_release
     - zabbix_release
     - node_exporter
