@@ -15,7 +15,6 @@
 
 - **tls_ca** - генерит корневой сертификат, который используется для подписи всех остальных сертификатов;
 - **tls_cert** - генерит сертификаты для узлов **zabbix** и **grafana** с нужным **Subject Alternative Name**
-- **epel_release** - устанавливает репозиторий **Extra Packages for Enterprise Linux** для расширенных пакетов, исключая из него пакеты с **zabbix** (они почему-то не работают в **AlmaLinux** с ошибкой [cannot set list of PSK ciphersuites](https://www.zabbix.com/forum/zabbix-troubleshooting-and-problems/435752-cannot-set-list-of-psk-ciphersuites-file-ssl_lib-c-line-1383-no-cipher-match));
 - **zabbix_release** - устанавливает официальные репозитории **Zabbix** для **AlmaLinux**;
 - **node_exporter** - устанавливает **Prometheus Node Exporter**;
 - **zabbix_agent2** - устанавилвает и настраивает **Zabbix Agent 2** (фактически в конфиге прописывается только **Server**, **ServerActive** и **Hostname** из переменных **zabbix_server_ip** и **zabbix_hostname** в [all.yml](group_vars/all.yml)), а также устанавливает сертификаты и параметры для подключения к серверу и его аутентификации;
