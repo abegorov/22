@@ -27,6 +27,7 @@
     owner: zabbix
     group: zabbix
     mode: '0600'
+  no_log: true
   notify: Restart zabbix-server service
 
 - name: Configure zabbix-server

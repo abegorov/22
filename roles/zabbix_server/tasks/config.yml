@@ -41,6 +41,7 @@
     content: '{{ zabbix_token_create.token }}'
     dest: passwords/zabbix_token.txt
     mode: '0600'
+  no_log: true
   when: zabbix_token_create.changed  # noqa: no-handler
 
 - name: Sleep for 180 seconds and continue with play
