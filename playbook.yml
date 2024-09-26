@@ -6,7 +6,6 @@
   roles:
     - tls_ca
     - tls_cert
-    - epel_release
     - zabbix_release
     - node_exporter
     - zabbix_agent2
