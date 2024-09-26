@@ -1,5 +1,151 @@
 ---
-- name: Install prometheus server
-  ansible.builtin.dnf:
-    name: golang-github-prometheus
+- name: Check if prometheus is installed
+  ansible.builtin.stat:
+    path: /usr/local/bin/prometheus
+  changed_when: false
+  check_mode: false
+  register: prometheus_is_installed
+
+- name: Check current prometheus version
+  ansible.builtin.command: /usr/local/bin/prometheus --version
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  register: prometheus_current_version
+  when: prometheus_is_installed.stat.exists
+
+- name: Create prometheus system group
+  ansible.builtin.group:
+    name: prometheus
     state: present
+    system: true
+
+- name: Create prometheus system user
+  ansible.builtin.user:
+    name: prometheus
+    groups: prometheus
+    append: true
+    shell: /usr/sbin/nologin
+    system: true
+    home: /var/lib/prometheus
+    createhome: true
+
+- name: Download and unarchive prometheus release binary
+  ansible.builtin.unarchive:
+    src: "{{ prometheus_download_url }}"
+    dest: /usr/local/bin/
+    include:
+      - prometheus-{{ prometheus_version }}.linux-amd64/prometheus
+      - prometheus-{{ prometheus_version }}.linux-amd64/promtool
+    remote_src: true
+    extra_opts: --strip-components=1
+    owner: root
+    group: root
+    mode: '0755'
+  when:
+    - not ansible_check_mode
+    - not prometheus_is_installed.stat.exists
+      or prometheus_version not in
+        prometheus_current_version.stdout_lines | first
+  notify: Restart prometheus service
+
+- name: Create prometheus config directory
+  ansible.builtin.file:
+    path: /etc/prometheus
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Update prometheus CA certificate file
+  ansible.builtin.copy:
+    src: '{{ tls_ca_cert }}'
+    dest: /etc/prometheus/ca.crt
+    backup: true
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload prometheus service
+
+- name: Update prometheus certificate file
+  ansible.builtin.copy:
+    content: |
+      {{ lookup('ansible.builtin.file', tls_cert_cert) }}
+      {{ lookup('ansible.builtin.file', tls_ca_cert) }}
+    dest: /etc/prometheus/host.crt
+    backup: true
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload prometheus service
+
+- name: Update prometheus key file
+  ansible.builtin.copy:
+    src: '{{ tls_cert_key }}'
+    dest: /etc/prometheus/host.key
+    backup: true
+    owner: prometheus
+    group: prometheus
+    mode: '0640'
+  no_log: true
+  notify: Reload prometheus service
+
+- name: Update prometheus password file
+  ansible.builtin.copy:
+    content: '{{ prometheus_password }}'
+    dest: /etc/prometheus/prometheus.passwd
+    backup: true
+    owner: prometheus
+    group: prometheus
+    mode: '0640'
+  no_log: true
+  notify: Reload prometheus service
+
+- name: Update metrics password file
+  ansible.builtin.copy:
+    content: '{{ node_exporter_password }}'
+    dest: /etc/prometheus/metrics.passwd
+    backup: true
+    owner: prometheus
+    group: prometheus
+    mode: '0640'
+  no_log: true
+  notify: Reload prometheus service
+
+- name: Update prometheus config
+  ansible.builtin.template:
+    src: prometheus.yml
+    dest: /etc/prometheus/prometheus.yml
+    backup: true
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload prometheus service
+
+- name: Update prometheus web config
+  ansible.builtin.template:
+    src: web.yml
+    dest: /etc/prometheus/web.yml
+    backup: true
+    owner: prometheus
+    group: prometheus
+    mode: '0640'
+  no_log: true
+  notify: Reload prometheus service
+
+- name: Install prometheus systemd service
+  ansible.builtin.template:
+    src: prometheus.service
+    dest: /etc/systemd/system/prometheus.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart prometheus service
+
+- name: Enable and start prometheus service
+  ansible.builtin.systemd:
+    name: prometheus.service
+    enabled: true
+    daemon_reload: true
+    state: started
+  when: not ansible_check_mode

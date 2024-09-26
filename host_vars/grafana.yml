@@ -1,2 +1,14 @@
 ---
 internal_ip: 192.168.50.20
+
+prometheus_version: 3.0.0-beta.0
+prometheus_download_url: "https://github.com/prometheus/prometheus/releases\
+  /download/v{{ prometheus_version }}\
+  /prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+prometheus_password: '{{ lookup("ansible.builtin.password",
+  "passwords/prometheus.txt", length=32) }}'
+prometheus_password_hash: '{{ lookup("ansible.builtin.password",
+  "passwords/prometheus.txt", length=32, encrypt="bcrypt", ident="2y") }}'
+
+prometheus_retention_time: 15d
+prometheus_retention_size: 10GB
