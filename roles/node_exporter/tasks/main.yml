@@ -12,7 +12,7 @@
   failed_when: false
   check_mode: false
   register: node_exporter_current_version
-  when: node_exporter_is_installed.stat.exists | bool
+  when: node_exporter_is_installed.stat.exists
 
 - name: Create node_exporter system group
   ansible.builtin.group:
@@ -87,6 +87,7 @@
     owner: node_exporter
     group: node_exporter
     mode: '0640'
+  no_log: true
   notify: Restart node_exporter service
 
 - name: Install node_exporter systemd socket

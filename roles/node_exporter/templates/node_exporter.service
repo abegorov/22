@@ -11,7 +11,18 @@ ExecStart=/usr/local/bin/node_exporter \
   --web.config.file=/etc/node_exporter/web.yml
 TimeoutStopSec=20s
 SendSIGKILL=no
+
+SyslogIdentifier=node_exporter
+RestartSec=1
 Restart=on-failure
+StartLimitInterval=0
+
+ProtectHome=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=yes
 
 [Install]
 WantedBy=multi-user.target
