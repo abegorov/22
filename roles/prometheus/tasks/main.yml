@@ -11,8 +11,8 @@
   changed_when: false
   failed_when: false
   check_mode: false
-  register: prometheus_current_version
   when: prometheus_is_installed.stat.exists
+  register: prometheus_current_version
 
 - name: Create prometheus system group
   ansible.builtin.group:
@@ -42,11 +42,9 @@
     owner: root
     group: root
     mode: '0755'
-  when:
-    - not ansible_check_mode
-    - not prometheus_is_installed.stat.exists
-      or prometheus_version not in
-        prometheus_current_version.stdout_lines | first
+  when: not prometheus_is_installed.stat.exists
+    or prometheus_version not in
+      prometheus_current_version.stdout_lines | first
   notify: Restart prometheus service
 
 - name: Create prometheus config directory

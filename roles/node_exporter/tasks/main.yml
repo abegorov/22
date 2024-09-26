@@ -11,8 +11,8 @@
   changed_when: false
   failed_when: false
   check_mode: false
-  register: node_exporter_current_version
   when: node_exporter_is_installed.stat.exists
+  register: node_exporter_current_version
 
 - name: Create node_exporter system group
   ansible.builtin.group:
@@ -41,11 +41,9 @@
     owner: root
     group: root
     mode: '0755'
-  when:
-    - not ansible_check_mode
-    - not node_exporter_is_installed.stat.exists
-      or node_exporter_version not in
-        node_exporter_current_version.stdout_lines | first
+  when: not node_exporter_is_installed.stat.exists
+    or node_exporter_version not in
+      node_exporter_current_version.stdout_lines | first
   notify: Restart node_exporter service
 
 - name: Create node_exporter config directory
