@@ -5,6 +5,7 @@
   run_once: true
   community.crypto.openssl_privatekey:
     path: '{{ tls_ca_key }}'
+  diff: false
 
 - name: Create certificate signing request (CSR) for CA certificate
   delegate_to: localhost
@@ -18,6 +19,7 @@
     key_usage: [keyCertSign]
     key_usage_critical: true
     privatekey_path: '{{ tls_ca_key }}'
+  diff: false
   changed_when: false
   register: ca_csr
 
@@ -31,3 +33,4 @@
     privatekey_path: '{{ tls_ca_key }}'
     provider: selfsigned
     selfsigned_not_after: '+10957d'
+  diff: false

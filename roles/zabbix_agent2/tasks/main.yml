@@ -25,6 +25,7 @@
     owner: zabbix
     group: zabbix
     mode: '0644'
+  diff: false
   notify: Restart zabbix-agent2 service
 
 - name: Update zabbix-agent2 certificate file
@@ -35,6 +36,7 @@
     owner: zabbix
     group: zabbix
     mode: '0644'
+  diff: false
   notify: Restart zabbix-agent2 service
 
 - name: Update zabbix-agent2 key file
