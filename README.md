@@ -14,10 +14,13 @@
 Задание сделано на **almalinux/9** версии **v9.4.20240805**. Для автоматизации процесса написаны следующие роли **Ansible**, поднимающие **Zabbix 7** в порядке их выполнения:
 
 - **tls_ca** - генерит корневой сертификат, который используется для подписи всех остальных сертификатов;
-- **tls_cert** - генерит сертификаты для узлов **zabbix** и **grafana** с нужным **Subject Alternative Name**
+- **tls_cert** - генерит сертификаты для узлов **zabbix** и **grafana** с нужным **Subject Alternative Name**;
 - **zabbix_release** - устанавливает официальные репозитории **Zabbix** для **AlmaLinux**;
-- **node_exporter** - устанавливает **Prometheus Node Exporter**;
+- **node_exporter** - устанавливает **Prometheus Node Exporter** (с аутентификацией и **TLS**);
 - **zabbix_agent2** - устанавилвает и настраивает **Zabbix Agent 2** (фактически в конфиге прописывается только **Server**, **ServerActive** и **Hostname** из переменных **zabbix_server_ip** и **zabbix_hostname** в [all.yml](group_vars/all.yml)), а также устанавливает сертификаты и параметры для подключения к серверу и его аутентификации;
+- **prometheus** - ставит **prometheus** (с аутентификацией и **TLS**) и настраивает сбор метрик со всех узлов в **inventory**;
+- **grafana** - ставит **grafana** и настраивает **provision** из конфигурационных файлов для **datasources** и **dashboards**, настраивает **datasource** для сервера **prometheus**;
+- **grafana_dashboards** - устанавливает **dashboard** [otus/otus](roles/grafana_dashboards/files/otus/otus.json);
 - **zabbix_server** - поднимает **Zabbix Server 7**:
   - ставит и настраивает **zabbix**, **postgresql**, **nginx**;
   - настраивает **SELinux**, включая политики **httpd_can_connect_zabbix** и **httpd_can_network_connect_db**;
@@ -58,15 +61,25 @@ ansible-galaxy collection install --upgrade community.zabbix
 
 ## Проверка
 
-1. Заходим на [localhost:8443](http://localhost:8443/index.php), вводим имя пользователя **otus** и пароль из файла `passwords/zabbix_admin.txt`.
-2. Переходим в [Dashboards](http://localhost:8443/zabbix.php?action=dashboard.list) и выбираем [otus](http://localhost:8443/zabbix.php?action=dashboard.view&dashboardid=347).
-3. Для того, чтобы на всех графиках появились данные необходимо подождать 10 минут, пока отработают **Discovery rules**.
-4. Наблюдаем графики:
+1. Заходим на [localhost:3000](https://localhost:3000), вводим имя пользователя **otus** и пароль из файла `passwords/grafana_admin.txt`.
+2. Переходим в [Dashboards](https://localhost:3000/dashboards) и выбираем **dashboard** `otus` в директории `otus`.
+3. Наблюдаем графики:
+
+    ![графики Grafana](images/grafana.png)
+
+4. Также можем зайти непосредственно на сам сервер **Prometheus**. Заходим [localhost:9090](https://localhost:9090/targets). Логин **prometheus**, пароль в файле `passwords/prometheus.txt` (видно, что все метрики успешно получаются через **TLS**).
+
+    ![prometheus targets](images/prometheus.png)
+
+5. Заходим на [localhost:8443](https://localhost:8443/index.php), вводим имя пользователя **otus** и пароль из файла `passwords/zabbix_admin.txt`.
+6. Переходим в [Dashboards](https://localhost:8443/zabbix.php?action=dashboard.list) и выбираем [otus](https://localhost:8443/zabbix.php?action=dashboard.view&dashboardid=347).
+7. Для того, чтобы на всех графиках появились данные необходимо подождать 10 минут, пока отработают **Discovery rules**.
+8. Наблюдаем графики:
 
     ![процессор и память](images/zabbix_cpu.png)
     ![диск](images/zabbix_disk.png)
     ![сеть](images/zabbix_network.png)
 
-5. На вкладке [Hosts](https://localhost:8443/zabbix.php?action=host.view) можно увидеть, что агенты подключились к серверу и для подключения используется **TLS**:
+9. На вкладке [Hosts](https://localhost:8443/zabbix.php?action=host.view) можно увидеть, что агенты подключились к серверу и для подключения используется **TLS**:
 
     ![шифрование](images/zabbix_encryption.png)
