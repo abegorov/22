@@ -59,6 +59,7 @@
     group: root
     mode: '0644'
     validate: zabbix_agent2 --test-config --config %s
+  diff: false
   notify: Restart zabbix-agent2 service
 
 - name: Enable and start zabbix-agent2 service
