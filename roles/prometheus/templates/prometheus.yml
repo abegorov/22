@@ -23,8 +23,7 @@ scrape_configs:
       password_file: /etc/prometheus/metrics.passwd
     static_configs:
 {% for host in groups['all'] %}
-      - targets:
-          - '{{ hostvars[host].internal_ip }}:9100'
-      - labels:
+      - targets: [{{ hostvars[host].internal_ip }}:9100]
+        labels:
           instance: '{{ host }}'
 {% endfor %}
