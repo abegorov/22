@@ -29,6 +29,5 @@ node_exporter_password: '{{ lookup("ansible.builtin.password",
 node_exporter_password_hash: '{{ lookup("ansible.builtin.password",
   "passwords/node_exporter.txt", length=32, encrypt="bcrypt", ident="2y") }}'
 
-
 zabbix_server_ip: 192.168.50.10
 zabbix_hostname: '{{ inventory_hostname }}'
