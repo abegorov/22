@@ -66,6 +66,35 @@
   no_log: true
   notify: Restart grafana-server service
 
+- name: Update grafana datasources
+  ansible.builtin.template:
+    src: 'datasources/{{ item }}'
+    dest: /etc/grafana/provisioning/datasources/{{ item }}
+    owner: root
+    group: grafana
+    mode: '0640'
+  no_log: true
+  loop: '{{ query("ansible.builtin.fileglob", role_path +
+    "/templates/datasources/*.yml") | map("ansible.builtin.basename") }}'
+  notify: Restart grafana-server service
+
+- name: Create dashboards directory
+  ansible.builtin.file:
+    path: /var/lib/grafana/dashboards
+    state: directory
+    owner: grafana
+    group: grafana
+    mode: '0755'
+
+- name: Update grafana dashboards provider
+  ansible.builtin.template:
+    src: dashboards.yml
+    dest: /etc/grafana/provisioning/dashboards/dashboards.yml
+    owner: root
+    group: grafana
+    mode: '0640'
+  notify: Restart grafana-server service
+
 - name: Enable and start grafana-server service
   ansible.builtin.systemd:
     name: grafana-server.service

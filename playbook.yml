@@ -17,6 +17,7 @@
   roles:
     - prometheus
     - grafana
+    - grafana_dashboards
 
 - name: Zabbix server provision
   hosts: zabbix
