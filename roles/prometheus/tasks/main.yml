@@ -63,6 +63,7 @@
     owner: root
     group: root
     mode: '0644'
+  diff: false
   notify: Reload prometheus service
 
 - name: Update prometheus certificate file
@@ -75,6 +76,7 @@
     owner: root
     group: root
     mode: '0644'
+  diff: false
   notify: Reload prometheus service
 
 - name: Update prometheus key file

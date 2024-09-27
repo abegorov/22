@@ -9,6 +9,7 @@
     owner: root
     group: root
     mode: '0644'
+  diff: false
   notify: Reload nginx service
 
 - name: Update zabbix-web key file
