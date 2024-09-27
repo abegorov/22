@@ -4,7 +4,7 @@
   become: false
   community.crypto.openssl_privatekey:
     path: '{{ tls_cert_key }}'
-  diff: false
+  no_log: true
 
 - name: Create host certificate signing request (CSR)
   delegate_to: localhost
@@ -14,7 +14,7 @@
     subject_alt_name: '{{ tls_cert_san }}'
     use_common_name_for_san: false
     privatekey_path: '{{ tls_cert_key }}'
-  diff: false
+  no_log: true
   changed_when: false
   register: csr
 
@@ -29,4 +29,4 @@
     ownca_privatekey_path: '{{ tls_cert_ca_key }}'
     ownca_not_after: '{{ tls_cert_not_after }}'
     ownca_not_before: '-1d'
-  diff: false
+  no_log: true
